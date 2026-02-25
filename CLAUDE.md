@@ -21,6 +21,19 @@ Target audience: Gen Z Kenyans, Sheng speakers, urban Nairobi youth.
 
 ---
 
+## Component Library Rules
+- ALWAYS use shadcn/ui components first before building anything custom
+- Check if shadcn has a component for the use case before writing raw HTML/Tailwind
+- Installed shadcn components: button, input, card, badge, dialog, toast
+- To add a new shadcn component run: `pnpm dlx shadcn@latest add [component-name]`
+- shadcn components live in `src/components/ui/` — never edit these files directly
+- Compose shadcn primitives together to build more complex components
+- Use shadcn's `cn()` utility from `src/lib/utils.ts` for conditional classNames
+- For things shadcn does not cover (custom word cards, hero sections, animated elements) build custom components in `src/components/` using Tailwind + Framer Motion
+- When in doubt: shadcn for functional UI (forms, dialogs, buttons, inputs), custom for branded/visual UI (hero, word cards, featured sections)
+
+---
+
 ## Folder Structure
 ```
 src/
