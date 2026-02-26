@@ -2,14 +2,15 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { Navbar } from '@/components/shared/Navbar'
 import { SearchBar } from '@/components/shared/SearchBar'
-import { WordOfTheDayCard } from '@/components/words/WordOfTheDayCard'
+import { WordOfTheWeekCard } from '@/components/words/WordOfTheWeekCard'
 import { WordsGrid } from '@/components/words/WordsGrid'
 import { SubscribeForm } from '@/components/shared/SubscribeForm'
 import connectToDatabase from '@/lib/mongodb'
 import Word from '@/models/Word'
-import WordOfTheDay from '@/models/WordOfTheDay'
+import WordOfTheWeek from '@/models/WordOfTheWeek'
 import type { IWordDocument } from '@/models/Word'
 import type { IWord } from '@/types'
+import { getCurrentWeekStart } from '@/lib/utils'
 
 // ISR — revalidate every 5 minutes so new approved words appear promptly
 export const revalidate = 300
@@ -21,36 +22,36 @@ export const metadata: Metadata = {
 }
 
 async function getHomepageData(): Promise<{
-  wordOfTheDay: IWord | null
+  wordOfTheWeek: IWord | null
   recentWords: IWord[]
-  today: string
+  weekStart: string
 }> {
-  const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+  const weekStart = getCurrentWeekStart()
 
   try {
     await connectToDatabase()
 
-    const [wotdDoc, wordDocs] = await Promise.all([
-      WordOfTheDay.findOne({ date: today })
+    const [wotwDoc, wordDocs] = await Promise.all([
+      WordOfTheWeek.findOne({ weekStart })
         .populate<{ word: IWordDocument }>('word')
         .lean(),
       Word.find({ status: 'approved' }).sort({ createdAt: -1 }).limit(12).lean(),
     ])
 
-    const wordOfTheDay: IWord | null =
-      wotdDoc?.word ? (JSON.parse(JSON.stringify(wotdDoc.word)) as IWord) : null
+    const wordOfTheWeek: IWord | null =
+      wotwDoc?.word ? (JSON.parse(JSON.stringify(wotwDoc.word)) as IWord) : null
 
     const recentWords: IWord[] = JSON.parse(JSON.stringify(wordDocs)) as IWord[]
 
-    return { wordOfTheDay, recentWords, today }
+    return { wordOfTheWeek, recentWords, weekStart }
   } catch (err) {
     console.error('[HomePage] DB fetch error:', err)
-    return { wordOfTheDay: null, recentWords: [], today }
+    return { wordOfTheWeek: null, recentWords: [], weekStart }
   }
 }
 
 export default async function HomePage() {
-  const { wordOfTheDay, recentWords, today } = await getHomepageData()
+  const { wordOfTheWeek, recentWords, weekStart } = await getHomepageData()
 
   return (
     <div className="min-h-screen bg-background">
@@ -147,7 +148,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── WORD OF THE DAY ─────────────────────────────────────────────── */}
+      {/* ── WORD OF THE WEEK ────────────────────────────────────────────── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-28">
         <div className="flex items-center gap-3 mb-10">
           <div className="w-2 h-2 rounded-full bg-[#c8f135] animate-pulse" />
@@ -155,7 +156,7 @@ export default async function HomePage() {
             Word of the Week
           </h2>
         </div>
-        <WordOfTheDayCard word={wordOfTheDay} date={today} />
+        <WordOfTheWeekCard word={wordOfTheWeek} weekStart={weekStart} />
       </section>
 
       {/* ── RECENT WORDS ────────────────────────────────────────────────── */}

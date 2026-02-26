@@ -62,12 +62,12 @@ export interface ISubscriber {
   unsubscribeToken: string
 }
 
-// ─── Word of the Day ──────────────────────────────────────────────────────────
+// ─── Word of the Week ─────────────────────────────────────────────────────────
 
-export interface IWordOfTheDay {
+export interface IWordOfTheWeek {
   _id: string
   word: string | IWord   // ObjectId ref — may be populated to full IWord
-  date: string           // YYYY-MM-DD
+  weekStart: string      // YYYY-MM-DD — the Monday of that week
 }
 
 // ─── API response envelope ────────────────────────────────────────────────────

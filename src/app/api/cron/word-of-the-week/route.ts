@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 import connectToDatabase from '@/lib/mongodb'
+import { getCurrentWeekStart } from '@/lib/utils'
 import { resend } from '@/lib/resend'
 import Word from '@/models/Word'
-import WordOfTheDay from '@/models/WordOfTheDay'
+import WordOfTheWeek from '@/models/WordOfTheWeek'
 import Subscriber from '@/models/Subscriber'
 import type { IWordDocument } from '@/models/Word'
 
@@ -20,29 +21,29 @@ export async function GET(req: NextRequest) {
   try {
     await connectToDatabase()
 
-    // ── Today's date ──────────────────────────────────────────────
-    const today = new Date().toISOString().slice(0, 10) // YYYY-MM-DD
+    // ── Current week start (Monday) ────────────────────────────────
+    const weekStart = getCurrentWeekStart()
 
-    // Idempotent: skip if already set for today
-    const existing = await WordOfTheDay.findOne({ date: today })
+    // Idempotent: skip if already set for this week
+    const existing = await WordOfTheWeek.findOne({ weekStart })
     if (existing) {
-      return NextResponse.json({ success: true, message: 'Already set for today' })
+      return NextResponse.json({ success: true, message: 'Already set for this week' })
     }
 
     // ── Pick a word ───────────────────────────────────────────────
-    // Exclude words used in the last 90 days
+    // Exclude words used in the last 52 weeks (~364 days)
     const cutoff = new Date()
-    cutoff.setDate(cutoff.getDate() - 90)
+    cutoff.setDate(cutoff.getDate() - 364)
     const cutoffStr = cutoff.toISOString().slice(0, 10)
 
-    const recentDates = await WordOfTheDay.find({ date: { $gte: cutoffStr } }).distinct('word')
+    const recentWordIds = await WordOfTheWeek.find({ weekStart: { $gte: cutoffStr } }).distinct('word')
 
     const candidate = await Word.aggregate<IWordDocument>([
       {
         $match: {
           status: 'approved',
           isFeatured: true,
-          _id: { $nin: recentDates },
+          _id: { $nin: recentWordIds },
         },
       },
       { $sample: { size: 1 } },
@@ -57,8 +58,8 @@ export async function GET(req: NextRequest) {
 
     const word = candidate[0]
 
-    // ── Save word of the day ──────────────────────────────────────
-    await WordOfTheDay.create({ word: word._id, date: today })
+    // ── Save word of the week ─────────────────────────────────────
+    await WordOfTheWeek.create({ word: word._id, weekStart })
 
     // ── Send emails ───────────────────────────────────────────────
     const subscribers = await Subscriber.find({ isActive: true }).select('email unsubscribeToken').lean()
@@ -77,8 +78,8 @@ export async function GET(req: NextRequest) {
           chunk.map((sub) => ({
             from: `Sheng Dictionary <${fromAddress}>`,
             to: sub.email,
-            subject: `Today's Sheng Word: ${word.word} 🔥`,
-            html: buildWotdEmail({
+            subject: `This Week's Sheng Word: ${word.word} 🔥`,
+            html: buildWotwEmail({
               word: word.word,
               partOfSpeech: word.partOfSpeech,
               definition: firstDefinition,
@@ -94,17 +95,18 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       word: word.word,
+      weekStart,
       emailsSent: subscribers.length,
     })
   } catch (err) {
-    console.error('[cron/word-of-the-day]', err)
+    console.error('[cron/word-of-the-week]', err)
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 })
   }
 }
 
 // ─── Email template ──────────────────────────────────────────────────────────
 
-interface WotdEmailProps {
+interface WotwEmailProps {
   word: string
   partOfSpeech: string
   definition: string
@@ -113,14 +115,14 @@ interface WotdEmailProps {
   unsubscribeUrl: string
 }
 
-function buildWotdEmail({
+function buildWotwEmail({
   word,
   partOfSpeech,
   definition,
   example,
   wordUrl,
   unsubscribeUrl,
-}: WotdEmailProps): string {
+}: WotwEmailProps): string {
   const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
   return `<!DOCTYPE html>
@@ -128,14 +130,14 @@ function buildWotdEmail({
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Today's Sheng Word: ${word}</title>
+  <title>This Week's Sheng Word: ${word}</title>
 </head>
 <body style="margin:0;padding:0;background:#0a0a0a;">
   <div style="max-width:520px;margin:0 auto;padding:48px 32px;font-family:system-ui,-apple-system,sans-serif;">
 
     <!-- Header label -->
     <p style="margin:0 0 28px;color:#c8f135;font-size:10px;letter-spacing:0.5em;text-transform:uppercase;font-weight:700;">
-      Sheng Dictionary · Word of the Day
+      Sheng Dictionary · Word of the Week
     </p>
 
     <!-- Word -->

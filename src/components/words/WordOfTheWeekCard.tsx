@@ -5,12 +5,12 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import type { IWord } from '@/types'
 
-interface WordOfTheDayCardProps {
+interface WordOfTheWeekCardProps {
   word: IWord | null
-  date: string // YYYY-MM-DD
+  weekStart: string // YYYY-MM-DD (Monday of the current week)
 }
 
-function formatDate(dateStr: string): string {
+function formatWeekStart(dateStr: string): string {
   // Parse YYYY-MM-DD manually to avoid timezone issues
   const [year, month, day] = dateStr.split('-').map(Number)
   const date = new Date(year, month - 1, day)
@@ -21,8 +21,8 @@ function formatDate(dateStr: string): string {
   })
 }
 
-export function WordOfTheDayCard({ word, date }: WordOfTheDayCardProps) {
-  const formattedDate = formatDate(date)
+export function WordOfTheWeekCard({ word, weekStart }: WordOfTheWeekCardProps) {
+  const formattedDate = formatWeekStart(weekStart)
 
   /* ── Empty state ───────────────────────────────────────────── */
   if (!word) {
@@ -31,18 +31,18 @@ export function WordOfTheDayCard({ word, date }: WordOfTheDayCardProps) {
         <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#c8f135]" />
         <div className="flex items-center gap-3 mb-8">
           <span className="text-[11px] font-mono tracking-[0.3em] uppercase text-[#c8f135] font-bold">
-            Word of the Day
+            Word of the Week
           </span>
           <span className="text-white/20">///</span>
           <span className="text-[11px] font-mono tracking-wider text-muted-foreground uppercase">
-            {formattedDate}
+            Week of {formattedDate}
           </span>
         </div>
         <p className="font-display font-black text-4xl uppercase text-muted-foreground/80">
           No word yet.
         </p>
         <p className="text-muted-foreground mt-3 text-sm">
-          The streets are quiet today. Check back tomorrow.
+          The streets are quiet this week. Check back Monday.
         </p>
       </div>
     )
@@ -87,11 +87,11 @@ export function WordOfTheDayCard({ word, date }: WordOfTheDayCardProps) {
         <div className="flex flex-wrap items-center gap-3 mb-10">
           <span className="inline-flex items-center gap-1.5 text-[11px] font-mono tracking-[0.3em] uppercase text-[#c8f135] font-bold">
             <span className="w-1.5 h-1.5 rounded-full bg-[#c8f135] animate-pulse" />
-            Word of the Day
+            Word of the Week
           </span>
           <span className="text-white/15 text-xs">///</span>
           <span className="text-[11px] font-mono tracking-wider text-muted-foreground uppercase">
-            {formattedDate}
+            Week of {formattedDate}
           </span>
         </div>
 

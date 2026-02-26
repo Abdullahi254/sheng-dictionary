@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "seed:v2": "tsx scripts/seed-v2.ts",
+    "seed:v3": "tsx scripts/seed-v3.ts",
+    "set-wotw": "tsx scripts/set-wotw.ts"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.11.1",
