@@ -29,7 +29,7 @@ export function SearchBar() {
           spellCheck={false}
           className="
             w-full h-16 pl-14 pr-36
-            bg-white/[0.05] border border-white/10
+            bg-white/5 border border-white/10
             rounded-xl text-base text-foreground
             placeholder:text-muted-foreground/60
             outline-none font-body
