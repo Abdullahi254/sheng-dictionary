@@ -117,11 +117,11 @@ Admins review from here and either approve (moves to words) or reject.
 }
 ```
 
-### wordOfTheDay
+### wordOfTheWeek
 ```typescript
 {
   word: ObjectId         // ref to words collection
-  date: string           // YYYY-MM-DD format, unique
+  weekStart: string      // YYYY-MM-DD format (Monday of that week), unique
 }
 ```
 
@@ -139,7 +139,7 @@ Admins review from here and either approve (moves to words) or reject.
 9. Admin word manager (add / edit / delete words)
 10. Public word submission form (lands in submissions, not live)
 11. Email subscription form + confirmation
-12. Word of the day cron job (Vercel Cron)
+12. Word of the week cron job (Vercel Cron)
 13. Auto-generated sitemap.xml
 14. Google AdSense integration
 15. Search with MongoDB Atlas Search or simple regex for MVP
@@ -274,12 +274,14 @@ CRON_SECRET=                    # Random string to protect cron endpoints
 - Admin routes: `/admin/*` — all protected via middleware
 - Admin can: approve/reject submissions, add/edit/delete words, manage subscribers, set word of the day
 
-## Word of the Day Logic
-- A Vercel Cron job runs daily at 8:00 AM EAT (5:00 AM UTC)
-- It picks a random word from approved words where `isFeatured: true` that hasn't been word of the day in the last 90 days
-- Saves it to `wordOfTheDay` collection with today's date
+## Word of the Week Logic
+- A Vercel Cron job runs every Monday at 8:00 AM EAT (5:00 AM UTC)
+- Cron schedule: `0 5 * * 1` (the `1` means Monday)
+- It picks a random word from approved words where `isFeatured: true` that hasn't been word of the week in the last 52 weeks
+- Saves it to `wordOfTheWeek` collection with the Monday date of that week as `weekStart`
 - Sends email to all active subscribers via Resend
-- Email subject: `Today's Sheng Word: [word] 🔥`
+- Email subject: `This Week's Sheng Word: [word] 🔥`
+- The homepage displays the current week's word by looking up the record where `weekStart` equals the most recent Monday
 
 ## Public Submission Flow
 1. User fills form at `/submit` — word, definition, example, their name (optional)
