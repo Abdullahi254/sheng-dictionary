@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Barlow_Condensed, DM_Sans } from 'next/font/google'
-import Script from 'next/script'
 import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
@@ -37,17 +36,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     // Force dark mode — this app lives in the night
     <html lang="en" className="dark">
+      <head>
+        {/* AdSense script in <head> so Google's crawler sees it in raw HTML */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5366695242791546"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body
         className={`${barlow.variable} ${dmSans.variable} font-body bg-background text-foreground antialiased`}
       >
         {children}
         <Toaster />
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5366695242791546"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
       </body>
     </html>
   )
