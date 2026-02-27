@@ -140,9 +140,10 @@ Admins review from here and either approve (moves to words) or reject.
 10. Public word submission form (lands in submissions, not live)
 11. Email subscription form + confirmation
 12. Word of the week cron job (Vercel Cron)
-13. Auto-generated sitemap.xml
-14. Google AdSense integration
-15. Search with MongoDB Atlas Search or simple regex for MVP
+13. Share Word as Image Feature
+14. Auto-generated sitemap.xml
+15. Google AdSense integration
+16. Search with MongoDB Atlas Search or simple regex for MVP
 
 ---
 
@@ -290,7 +291,31 @@ CRON_SECRET=                    # Random string to protect cron endpoints
 4. Admin approves → word moves to `words` collection with status `approved` → appears on site
 5. Admin rejects → status set to `rejected` → never appears publicly
 
----
+## Share Word as Image Feature
 
-## Current Status
-Project just initialized. Nothing built yet. Start with Step 1: MongoDB connection and models.
+**Component:** `src/components/words/ShareWordButton.tsx`
+**Utility:** `src/lib/generateWordImage.ts`
+
+### Canvas Spec (1080×1080px)
+- Background: dark gradient `#0a0a0a` → `#1a1a1a` with noise texture drawn via canvas
+- Word text: dominant, large, display font (Playfair Display or Libre Baskerville loaded via FontFace API)
+- Accent color `#39FF14` for: part-of-speech label, thin rule line, bottom branding
+- Definition: clean sans-serif, white, wrapped to 2–3 lines max
+- Example sentence: italic, muted grey
+- Bottom bar: `shengdictionary.co.ke` left, `Sheng Dictionary` right — both in accent
+- Optional: word text repeated large, 5% opacity, rotated 15°, as background watermark layer
+
+### Share Flow
+1. User clicks **Share Word** button on any word page
+2. Canvas renders off-screen (not appended to DOM)
+3. Canvas → PNG Blob via `canvas.toBlob()`
+4. If `navigator.share` + `files` supported → open native share sheet (WhatsApp, IG Stories, X)
+5. If not supported (desktop) → auto-download as `[word]-sheng-dictionary.png`
+6. Show toast: `"Image ready to share! 🔥"`
+
+### Implementation Rules
+- Load Google Font via `FontFace` API — `await font.load()` before any canvas draw call
+- Fall back to `Georgia, serif` if font fails to load — never let a font error break the feature
+- Show loading spinner on button during generation
+- Never use an external image generation service — canvas only, runs entirely client-side
+- Export `generateWordImage(word: WordType): Promise<Blob>` from `src/lib/generateWordImage.ts`
