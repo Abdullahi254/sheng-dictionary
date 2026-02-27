@@ -61,7 +61,7 @@ const WordSchema = new Schema<IWordDocument>(
 // Index for search performance
 WordSchema.index({ word: 'text', 'definitions.meaning': 'text' })
 WordSchema.index({ status: 1 })
-WordSchema.index({ slug: 1 })
+// slug index is created automatically by unique: true on the field
 
 const Word: Model<IWordDocument> =
   mongoose.models.Word ?? mongoose.model<IWordDocument>('Word', WordSchema)

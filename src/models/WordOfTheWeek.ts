@@ -10,8 +10,7 @@ const WordOfTheWeekSchema = new Schema<IWordOfTheWeekDocument>({
   weekStart: { type: String, required: true, unique: true }, // YYYY-MM-DD (Monday)
 })
 
-WordOfTheWeekSchema.index({ weekStart: 1 })
-
+// weekStart index is created automatically by unique: true on the field
 const WordOfTheWeek: Model<IWordOfTheWeekDocument> =
   mongoose.models.WordOfTheWeek ??
   mongoose.model<IWordOfTheWeekDocument>('WordOfTheWeek', WordOfTheWeekSchema)

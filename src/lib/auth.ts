@@ -28,11 +28,19 @@ export const authOptions: NextAuthOptions = {
       sendVerificationRequest: async ({ identifier: email, url }) => {
         if (email !== ADMIN_EMAIL) return
 
+        // Wrap the NextAuth callback URL in an intermediate confirmation page.
+        // This prevents Google Safe Browsing pre-fetches from consuming the
+        // one-time token before the admin actually clicks the button.
+        const confirmUrl = url.replace(
+          '/api/auth/callback/email',
+          '/admin/verify'
+        )
+
         const { error } = await resend.emails.send({
           from: `Sheng Dictionary <${process.env.EMAIL_FROM ?? 'noreply@shengdictionary.co.ke'}>`,
           to: email,
           subject: 'Sign in to Sheng Dictionary Admin',
-          html: buildMagicLinkEmail(url),
+          html: buildMagicLinkEmail(confirmUrl),
         })
 
         if (error) {
