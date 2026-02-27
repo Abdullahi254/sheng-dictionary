@@ -16,7 +16,7 @@ export function Navbar() {
         <div className="flex items-center gap-6">
           <Link
             href="/browse"
-            className="hidden sm:block text-sm font-body text-muted-foreground hover:text-foreground transition-colors"
+            className="text-sm font-body text-muted-foreground hover:text-foreground transition-colors"
           >
             Browse
           </Link>
