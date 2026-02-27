@@ -5,6 +5,7 @@ import { Navbar } from '@/components/shared/Navbar'
 import { WordsGrid } from '@/components/words/WordsGrid'
 import { FilterBar } from '@/components/browse/FilterBar'
 import { BrowsePagination } from '@/components/browse/BrowsePagination'
+import AdUnit from '@/components/shared/AdUnit'
 import connectToDatabase from '@/lib/mongodb'
 import Word from '@/models/Word'
 import type { IWord, PartOfSpeech } from '@/types'
@@ -172,6 +173,8 @@ export default async function BrowsePage({ searchParams }: Props) {
             )}
 
             <WordsGrid key={`${q}|${pos}|${tag}|${page}`} words={words} immediate />
+
+            <AdUnit slot="9112255298" className="my-8" />
 
             <BrowsePagination
               currentPage={page}

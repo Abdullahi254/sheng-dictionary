@@ -7,6 +7,7 @@ import { ChevronRight, MapPin, Eye, Calendar } from 'lucide-react'
 import { Navbar } from '@/components/shared/Navbar'
 import { ViewCountTracker } from '@/components/words/ViewCountTracker'
 import { ShareWordButton } from '@/components/words/ShareWordButton'
+import AdUnit from '@/components/shared/AdUnit'
 import { Badge } from '@/components/ui/badge'
 import connectToDatabase from '@/lib/mongodb'
 import Word from '@/models/Word'
@@ -257,6 +258,11 @@ export default async function WordPage({ params }: Props) {
                       <p className="text-foreground/85 text-lg md:text-xl leading-relaxed font-body mb-0">
                         {def.meaning}
                       </p>
+
+                      {/* Ad between definition and example — first card only */}
+                      {idx === 0 && (
+                        <AdUnit slot="9112255298" className="my-5" />
+                      )}
 
                       {/* Example sentence */}
                       {def.example && (
