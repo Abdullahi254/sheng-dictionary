@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Barlow_Condensed, DM_Sans } from 'next/font/google'
+import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
 // Display font — bold, condensed, matatu poster energy
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className={`${barlow.variable} ${dmSans.variable} font-body bg-background text-foreground antialiased`}
       >
         {children}
+        <Toaster />
       </body>
     </html>
   )

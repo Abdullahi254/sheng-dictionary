@@ -6,6 +6,7 @@ import { ChevronRight, MapPin, Eye, Calendar } from 'lucide-react'
 
 import { Navbar } from '@/components/shared/Navbar'
 import { ViewCountTracker } from '@/components/words/ViewCountTracker'
+import { ShareWordButton } from '@/components/words/ShareWordButton'
 import { Badge } from '@/components/ui/badge'
 import connectToDatabase from '@/lib/mongodb'
 import Word from '@/models/Word'
@@ -199,6 +200,11 @@ export default async function WordPage({ params }: Props) {
             >
               {word.word}
             </h1>
+
+            {/* Share button — visible without scrolling on both mobile and desktop */}
+            <div className="mb-8">
+              <ShareWordButton word={word} />
+            </div>
 
             {/* Meta row */}
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pb-10 font-mono text-[11px] tracking-wider uppercase text-muted-foreground/80">
