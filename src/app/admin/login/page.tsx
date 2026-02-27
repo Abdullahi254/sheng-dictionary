@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { signIn } from 'next-auth/react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
@@ -8,7 +8,7 @@ import { Mail, ArrowLeft, CheckCircle, AlertCircle, Loader2 } from 'lucide-react
 
 type Status = 'idle' | 'loading' | 'sent' | 'error'
 
-export default function AdminLoginPage() {
+function LoginContent() {
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') ?? '/admin'
   // NextAuth passes error codes via ?error= on redirect
@@ -187,5 +187,13 @@ export default function AdminLoginPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
   )
 }

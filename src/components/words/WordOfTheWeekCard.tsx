@@ -57,7 +57,7 @@ export function WordOfTheWeekCard({ word, weekStart }: WordOfTheWeekCardProps) {
       initial={{ opacity: 0, y: 32 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
     >
       {/* Left accent stripe */}
       <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#c8f135]" />
