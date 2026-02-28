@@ -50,10 +50,24 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
 
+  session: {
+    strategy: 'jwt',
+  },
+
   callbacks: {
     // Final gate: reject sign-in if the verified email is not the admin.
     async signIn({ user }) {
       return user.email === ADMIN_EMAIL
+    },
+    // Populate the session object from the JWT token so getServerSession
+    // returns a full session regardless of which page is being rendered.
+    async jwt({ token, user }) {
+      if (user) token.email = user.email
+      return token
+    },
+    async session({ session, token }) {
+      if (token.email) session.user = { ...session.user, email: token.email as string }
+      return session
     },
   },
 
