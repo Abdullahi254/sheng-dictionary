@@ -172,11 +172,11 @@ export function FilterBar({ tags, total }: FilterBarProps) {
 
           {/* Tag pills */}
           {tags.length > 0 && (
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <div className="flex items-center gap-x-4">
               <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-muted-foreground/80 shrink-0">
                 Tags:
               </span>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
                 {tags.map((tag) => (
                   <button
                     key={tag}

@@ -20,6 +20,9 @@ export async function POST(req: NextRequest) {
     const submittedBy = typeof body.submittedBy === 'string' && body.submittedBy.trim()
       ? body.submittedBy.trim()
       : 'anonymous'
+    const tags = Array.isArray(body.tags)
+      ? (body.tags as unknown[]).filter((t): t is string => typeof t === 'string' && t.trim().length > 0).map((t) => t.trim().toLowerCase())
+      : []
 
     // ── Validate ──────────────────────────────────────────────
     if (!word) {
@@ -53,7 +56,7 @@ export async function POST(req: NextRequest) {
       status: 'pending',
       viewCount: 0,
       isFeatured: false,
-      tags: [],
+      tags,
       submittedBy,
     })
 

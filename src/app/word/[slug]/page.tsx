@@ -2,13 +2,12 @@ import { cache } from 'react'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ChevronRight, MapPin, Eye, Calendar } from 'lucide-react'
+import { ChevronRight, MapPin, Eye, Calendar, ArrowRight } from 'lucide-react'
 
 import { Navbar } from '@/components/shared/Navbar'
 import { ViewCountTracker } from '@/components/words/ViewCountTracker'
 import { ShareWordButton } from '@/components/words/ShareWordButton'
 import AdUnit from '@/components/shared/AdUnit'
-import { Badge } from '@/components/ui/badge'
 import connectToDatabase from '@/lib/mongodb'
 import Word from '@/models/Word'
 import type { IWord, PartOfSpeech } from '@/types'
@@ -39,7 +38,6 @@ const getWordBySlug = cache(async (slug: string) => {
 
     const word = JSON.parse(JSON.stringify(doc)) as IWord
 
-    // Batch-fetch related words in the same request
     let relatedWords: RelatedWord[] = []
     if (word.relatedWords.length > 0) {
       const relatedDocs = await Word.find(
@@ -74,9 +72,6 @@ export async function generateStaticParams(): Promise<{ slug: string }[]> {
 }
 
 // ─── generateMetadata ─────────────────────────────────────────────────────────
-// Title format:       [Word] Meaning in Sheng | Sheng Dictionary
-// Description format: Learn what [word] means in Sheng. [First definition].
-//                     See usage examples and related Sheng words.
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const data = await getWordBySlug(slug)
@@ -106,11 +101,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 // ─── Design helpers ───────────────────────────────────────────────────────────
 const posColors: Record<PartOfSpeech, string> = {
-  noun: 'text-sky-400/80 border-sky-400/20 bg-sky-400/5',
-  verb: 'text-orange-400/80 border-orange-400/20 bg-orange-400/5',
-  adjective: 'text-violet-400/80 border-violet-400/20 bg-violet-400/5',
-  expression: 'text-[#c8f135]/80 border-[#c8f135]/20 bg-[#c8f135]/5',
-  adverb: 'text-rose-400/80 border-rose-400/20 bg-rose-400/5',
+  noun:       'text-sky-400    border-sky-400/25    bg-sky-400/8',
+  verb:       'text-orange-400 border-orange-400/25 bg-orange-400/8',
+  adjective:  'text-violet-400 border-violet-400/25 bg-violet-400/8',
+  expression: 'text-[#c8f135] border-[#c8f135]/25  bg-[#c8f135]/8',
+  adverb:     'text-rose-400   border-rose-400/25   bg-rose-400/8',
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -143,132 +138,127 @@ export default async function WordPage({ params }: Props) {
 
   return (
     <>
-      {/* Structured data — search engines read this regardless of position */}
+      {/* Structured data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Client-side view increment — fires on every real user visit,
-          not just on ISR regeneration */}
+      {/* Client-side view increment */}
       <ViewCountTracker slug={word.slug} />
 
       <div className="min-h-screen bg-background">
         <Navbar />
 
-        {/* ── WORD HEADER ──────────────────────────────────────────────── */}
-        <header className="pt-24 border-b border-white/6">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        {/* ── WORD HEADER ───────────────────────────────────────────── */}
+        <header className="pt-24 pb-0">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6">
 
             {/* Breadcrumb */}
             <nav
               aria-label="Breadcrumb"
-              className="flex items-center gap-1.5 mb-10 font-mono text-[11px] tracking-wider uppercase text-muted-foreground/80"
+              className="flex items-center gap-1.5 mb-8 font-mono text-[10px] tracking-[0.3em] uppercase text-muted-foreground/40"
             >
-              <Link href="/" className="hover:text-muted-foreground/80 transition-colors">
-                Home
-              </Link>
+              <Link href="/" className="hover:text-muted-foreground/70 transition-colors">Home</Link>
               <ChevronRight className="w-3 h-3 shrink-0" />
-              <Link href="/browse" className="hover:text-muted-foreground/80 transition-colors">
-                Browse
-              </Link>
+              <Link href="/browse" className="hover:text-muted-foreground/70 transition-colors">Browse</Link>
               <ChevronRight className="w-3 h-3 shrink-0" />
-              <span className="text-muted-foreground/80">{word.word}</span>
+              <span className="text-muted-foreground/60">{word.word}</span>
             </nav>
 
-            {/* Part of speech + tags */}
-            <div className="flex flex-wrap items-center gap-2 mb-5">
-              <span
-                className={`inline-block text-[11px] font-mono tracking-[0.25em] uppercase border rounded-full px-3 py-1 ${posColor}`}
-              >
+            {/* Part of speech pill */}
+            <div className="mb-4">
+              <span className={`inline-block text-[10px] font-mono tracking-[0.3em] uppercase border rounded-full px-3 py-1 ${posColor}`}>
                 {word.partOfSpeech}
               </span>
-              {word.tags.map((tag) => (
-                <Badge
-                  key={tag}
-                  variant="secondary"
-                  className="text-[10px] font-mono tracking-wide bg-white/4 text-muted-foreground/80 border-0"
-                >
-                  #{tag}
-                </Badge>
-              ))}
             </div>
 
-            {/* h1 — must contain the word itself (SEO requirement) */}
+            {/* h1 — the visual hero, must contain the word (SEO) */}
             <h1
-              className="font-display font-black uppercase leading-none tracking-tight text-foreground mb-6"
-              style={{ fontSize: 'clamp(64px, 12vw, 144px)' }}
+              className="font-display font-black uppercase leading-[0.9] tracking-tight text-foreground mb-5"
+              style={{ fontSize: 'clamp(60px, 13vw, 128px)' }}
             >
               {word.word}
             </h1>
 
-            {/* Share button — visible without scrolling on both mobile and desktop */}
-            <div className="mb-8">
-              <ShareWordButton word={word} />
-            </div>
+            {/* Chartreuse accent rule */}
+            <div className="h-px w-14 bg-[#c8f135] mb-6 opacity-50" />
 
-            {/* Meta row */}
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pb-10 font-mono text-[11px] tracking-wider uppercase text-muted-foreground/80">
-              {word.region && (
+            {/* Tag pills — accent-bordered, link to browse filtered by tag */}
+            {word.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-6">
+                {word.tags.map((tag) => (
+                  <Link
+                    key={tag}
+                    href={`/browse?tag=${encodeURIComponent(tag)}`}
+                    className="inline-block text-[10px] font-mono tracking-wide border border-[#c8f135]/20 text-[#c8f135]/60 rounded-full px-2.5 py-0.5 hover:border-[#c8f135]/50 hover:text-[#c8f135] transition-colors"
+                  >
+                    #{tag}
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {/* Meta row + share — pinned to bottom of header */}
+            <div className="flex flex-wrap items-center justify-between gap-4 pb-8 border-b border-white/[0.06]">
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 font-mono text-[10px] tracking-[0.25em] uppercase text-muted-foreground/40">
+                {word.region && (
+                  <span className="flex items-center gap-1.5">
+                    <MapPin className="w-3 h-3" />
+                    {word.region}
+                  </span>
+                )}
                 <span className="flex items-center gap-1.5">
-                  <MapPin className="w-3 h-3" />
-                  {word.region}
+                  <Eye className="w-3 h-3" />
+                  {word.viewCount.toLocaleString()} views
                 </span>
-              )}
-              <span className="flex items-center gap-1.5">
-                <Eye className="w-3 h-3" />
-                {word.viewCount.toLocaleString()} views
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Calendar className="w-3 h-3" />
-                First seen {createdAt}
-              </span>
+                <span className="flex items-center gap-1.5">
+                  <Calendar className="w-3 h-3" />
+                  {createdAt}
+                </span>
+              </div>
+              <ShareWordButton word={word} />
             </div>
           </div>
         </header>
 
-        {/* ── CONTENT ──────────────────────────────────────────────────── */}
-        <main className="max-w-5xl mx-auto px-4 sm:px-6 py-16 space-y-20">
+        {/* ── CONTENT ───────────────────────────────────────────────── */}
+        <main className="max-w-3xl mx-auto px-4 sm:px-6 py-10 space-y-12">
 
-          {/* ── DEFINITIONS ──────────────────────────────────────────── */}
+          {/* ── DEFINITIONS ─────────────────────────────────────────── */}
           <section aria-labelledby="definitions-heading">
             <h2
               id="definitions-heading"
-              className="font-display font-black text-[11px] uppercase tracking-[0.35em] text-muted-foreground/80 mb-8"
+              className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground/40 mb-4"
             >
               {word.definitions.length === 1 ? 'Definition' : `${word.definitions.length} Definitions`}
             </h2>
 
-            <ol className="space-y-5">
+            <ol className="space-y-3">
               {word.definitions.map((def, idx) => (
                 <li key={idx} className="group relative">
-                  <div className="relative bg-[#0f0f0f] border border-white/6 rounded-xl overflow-hidden transition-colors duration-200 group-hover:border-white/9">
+                  <div className="relative bg-[#111111] border border-white/[0.06] rounded-2xl overflow-hidden transition-colors duration-200 group-hover:border-white/[0.1]">
 
-                    {/* Ghost number — decorative, not in the reading flow */}
+                    {/* Ghost index number */}
                     <span
                       aria-hidden
-                      className="absolute top-2 right-5 font-display font-black leading-none text-white/[0.035] select-none pointer-events-none"
-                      style={{ fontSize: 'clamp(72px, 9vw, 108px)' }}
+                      className="absolute top-3 right-4 font-display font-black leading-none text-white/[0.035] select-none pointer-events-none"
+                      style={{ fontSize: 'clamp(52px, 7vw, 76px)' }}
                     >
                       {String(idx + 1).padStart(2, '0')}
                     </span>
 
-                    <div className="relative p-7 md:p-10">
+                    <div className="relative px-5 py-5 sm:px-6">
                       {/* Meaning */}
-                      <p className="text-foreground/85 text-lg md:text-xl leading-relaxed font-body mb-0">
+                      <p className="text-foreground/90 text-base sm:text-lg leading-relaxed font-body">
                         {def.meaning}
                       </p>
 
-                      {/* Ad between definition and example — first card only */}
-                      {idx === 0 && (
-                        <AdUnit slot="9112255298" className="my-5" />
-                      )}
-
-                      {/* Example sentence */}
+                      {/* Example sentence — italic, visually distinct */}
                       {def.example && (
-                        <blockquote className="mt-5 pl-4 border-l-2 border-[#c8f135]/30 text-muted-foreground italic text-base leading-relaxed">
+                        <p className="mt-3 pl-3 border-l-2 border-[#c8f135]/20 text-muted-foreground/60 italic text-sm leading-relaxed font-body">
                           &ldquo;{def.example}&rdquo;
-                        </blockquote>
+                        </p>
                       )}
                     </div>
                   </div>
@@ -277,42 +267,45 @@ export default async function WordPage({ params }: Props) {
             </ol>
           </section>
 
-          {/* ── ETYMOLOGY ────────────────────────────────────────────── */}
+          {/* AdUnit — outside the definition cards, between content sections */}
+          <AdUnit slot="9112255298" />
+
+          {/* ── ETYMOLOGY ───────────────────────────────────────────── */}
           {word.origin && (
             <section aria-labelledby="origin-heading">
               <h2
                 id="origin-heading"
-                className="font-display font-black text-[11px] uppercase tracking-[0.35em] text-muted-foreground/80 mb-6"
+                className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground/40 mb-4"
               >
                 Etymology
               </h2>
-              <p className="pl-5 border-l border-white/10 text-muted-foreground text-base leading-relaxed max-w-2xl">
+              <p className="pl-4 border-l-2 border-white/[0.08] text-muted-foreground/70 text-sm sm:text-base leading-relaxed font-body">
                 {word.origin}
               </p>
             </section>
           )}
 
-          {/* ── RELATED WORDS ────────────────────────────────────────── */}
-          {relatedWords.length > 0 && (
+          {/* ── RELATED WORDS ───────────────────────────────────────── */}
+          {relatedWords.length > 0 ? (
             <section aria-labelledby="related-heading">
               <h2
                 id="related-heading"
-                className="font-display font-black text-[11px] uppercase tracking-[0.35em] text-muted-foreground/80 mb-6"
+                className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground/40 mb-4"
               >
                 See Also
               </h2>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-2">
                 {relatedWords.map((rw) => (
                   <Link
                     key={rw._id}
                     href={`/word/${rw.slug}`}
                     className="
                       group/rw inline-flex items-center gap-1.5
-                      px-5 py-3
-                      bg-[#111111] border border-white/[0.07] rounded-xl
-                      font-display font-black text-xl uppercase tracking-tight
-                      text-foreground/85
-                      hover:text-[#c8f135] hover:border-[#c8f135]/20 hover:bg-[#c8f135]/4
+                      px-4 py-2.5
+                      bg-[#111111] border border-white/[0.06] rounded-xl
+                      font-display font-black text-lg uppercase tracking-tight
+                      text-foreground/80
+                      hover:text-[#c8f135] hover:border-[#c8f135]/20 hover:bg-[#c8f135]/5
                       transition-all duration-200
                     "
                   >
@@ -322,36 +315,51 @@ export default async function WordPage({ params }: Props) {
                 ))}
               </div>
             </section>
+          ) : (
+            /* Fallback CTA when no related words exist in DB */
+            <section>
+              <div className="flex items-center justify-between px-5 py-4 bg-[#111111] border border-white/[0.06] rounded-2xl">
+                <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground/40">
+                  Explore more Sheng words
+                </p>
+                <Link
+                  href="/browse"
+                  className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#c8f135]/70 hover:text-[#c8f135] hover:gap-2 transition-all duration-150"
+                >
+                  Browse <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </section>
           )}
 
-          {/* ── PAGE FOOTER META ─────────────────────────────────────── */}
-          <div className="pt-10 border-t border-white/6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <p className="font-mono text-[11px] tracking-wider uppercase text-muted-foreground/80">
+          {/* ── PAGE FOOTER META ────────────────────────────────────── */}
+          <div className="pt-8 border-t border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <p className="font-mono text-[10px] tracking-[0.25em] uppercase text-muted-foreground/35">
               {word.submittedBy !== 'anonymous'
                 ? `Submitted by ${word.submittedBy}`
                 : 'Community submission'}
             </p>
             <Link
               href="/browse"
-              className="text-[11px] font-mono tracking-wider uppercase text-muted-foreground/80 hover:text-[#c8f135] transition-colors"
+              className="text-[10px] font-mono tracking-[0.25em] uppercase text-muted-foreground/40 hover:text-[#c8f135] transition-colors"
             >
               ← Back to Browse
             </Link>
           </div>
         </main>
 
-        {/* ── SITE FOOTER ──────────────────────────────────────────────── */}
-        <footer className="mt-8 border-t border-white/5">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 flex flex-col sm:flex-row items-center justify-between gap-6">
+        {/* ── SITE FOOTER ───────────────────────────────────────────── */}
+        <footer className="border-t border-white/[0.06]">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
               <Link href="/" className="font-display font-black text-xl uppercase">
                 SHENG<span className="text-[#c8f135]">.</span>
               </Link>
-              <p className="text-muted-foreground/80 text-xs mt-1 font-mono tracking-wide">
+              <p className="text-muted-foreground/40 text-xs mt-1 font-mono tracking-wide">
                 Nairobi&apos;s unofficial official dictionary.
               </p>
             </div>
-            <p className="text-muted-foreground/80 text-xs font-mono">
+            <p className="text-muted-foreground/35 text-xs font-mono">
               © {new Date().getFullYear()} Sheng Dictionary.
             </p>
           </div>

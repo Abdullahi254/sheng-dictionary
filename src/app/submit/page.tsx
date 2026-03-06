@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { ChevronDown, Loader2, ArrowRight } from 'lucide-react'
 import { Navbar } from '@/components/shared/Navbar'
+import { TagsInput } from '@/components/words/TagsInput'
 import type { PartOfSpeech } from '@/types'
 
 // ─── Options ─────────────────────────────────────────────────────────────────
@@ -66,6 +67,7 @@ const inputClass = `
 
 export default function SubmitPage() {
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
+  const [tags, setTags] = useState<string[]>([])
   const [status, setStatus] = useState<Status>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -91,6 +93,7 @@ export default function SubmitPage() {
           partOfSpeech: form.partOfSpeech,
           region: form.region,
           submittedBy: form.submittedBy,
+          tags,
         }),
       })
 
@@ -139,7 +142,7 @@ export default function SubmitPage() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <button
-                onClick={() => { setForm(EMPTY_FORM); setStatus('idle') }}
+                onClick={() => { setForm(EMPTY_FORM); setTags([]); setStatus('idle') }}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-[#c8f135] text-black font-display font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-[#d4f545] active:scale-95 transition-all"
               >
                 Submit another word
@@ -260,6 +263,17 @@ export default function SubmitPage() {
                   rows={2}
                   className={`${inputClass} py-3 resize-none leading-relaxed`}
                 />
+              </div>
+
+              {/* ── Tags ── */}
+              <div className="space-y-1.5">
+                <label className="block font-mono text-[11px] tracking-[0.3em] uppercase text-muted-foreground/80">
+                  Tags
+                  <span className="ml-2 text-muted-foreground/80 normal-case tracking-normal font-body text-xs">
+                    (optional)
+                  </span>
+                </label>
+                <TagsInput value={tags} onChange={setTags} />
               </div>
 
               {/* ── Region + Name in a row ── */}
