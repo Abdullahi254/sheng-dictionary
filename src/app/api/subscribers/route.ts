@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     await connectToDatabase()
 
     const appUrl = process.env.NEXTAUTH_URL ?? 'https://shengdictionary.co.ke'
-    const fromAddress = process.env.EMAIL_FROM ?? 'noreply@shengdictionary.co.ke'
+    const fromAddress = process.env.EMAIL_FROM ?? 'noreply@contact.shengdictionary.co.ke'
 
     // Re-activate if they previously unsubscribed
     const existing = await Subscriber.findOne({ email })

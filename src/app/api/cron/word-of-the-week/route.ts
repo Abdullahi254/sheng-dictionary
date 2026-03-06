@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
 
     if (subscribers.length > 0) {
       const appUrl = process.env.NEXTAUTH_URL ?? 'https://shengdictionary.co.ke'
-      const fromAddress = process.env.EMAIL_FROM ?? 'noreply@shengdictionary.co.ke'
+      const fromAddress = process.env.EMAIL_FROM ?? 'noreply@contact.shengdictionary.co.ke'
       const firstDefinition = word.definitions[0]?.meaning ?? ''
 
       // Resend batch accepts up to 100 emails per call; chunk if needed

@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Admin email not configured' }, { status: 500 })
     }
 
-    const fromAddress = process.env.EMAIL_FROM ?? 'noreply@shengdictionary.co.ke'
+    const fromAddress = process.env.EMAIL_FROM ?? 'noreply@contact.shengdictionary.co.ke'
     const originalFrom = (email as { from?: string }).from ?? 'Unknown sender'
     const originalSubject = (email as { subject?: string }).subject ?? '(no subject)'
     const htmlBody = (email as { html?: string }).html ?? undefined

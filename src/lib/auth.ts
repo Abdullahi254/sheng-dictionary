@@ -20,7 +20,7 @@ export const authOptions: NextAuthOptions = {
 
   providers: [
     EmailProvider({
-      from: process.env.EMAIL_FROM ?? 'noreply@shengdictionary.co.ke',
+      from: process.env.EMAIL_FROM ?? 'noreply@contact.shengdictionary.co.ke',
 
       // Custom send function routes through Resend instead of nodemailer.
       // Non-admin emails are silently ignored so we don't leak whether an
@@ -37,7 +37,7 @@ export const authOptions: NextAuthOptions = {
         )
 
         const { error } = await resend.emails.send({
-          from: `Sheng Dictionary <${process.env.EMAIL_FROM ?? 'noreply@shengdictionary.co.ke'}>`,
+          from: `Sheng Dictionary <${process.env.EMAIL_FROM ?? 'noreply@contact.shengdictionary.co.ke'}>`,
           to: email,
           subject: 'Sign in to Sheng Dictionary Admin',
           html: buildMagicLinkEmail(confirmUrl),
