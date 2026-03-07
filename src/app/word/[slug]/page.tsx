@@ -223,7 +223,7 @@ export default async function WordPage({ params }: Props) {
         </header>
 
         {/* ── CONTENT ───────────────────────────────────────────────── */}
-        <main className="max-w-3xl mx-auto px-4 sm:px-6 py-10 space-y-12">
+        <main className="max-w-3xl mx-auto px-4 sm:px-6 py-10 space-y-8">
 
           {/* ── DEFINITIONS ─────────────────────────────────────────── */}
           <section aria-labelledby="definitions-heading">
@@ -268,7 +268,9 @@ export default async function WordPage({ params }: Props) {
           </section>
 
           {/* AdUnit — outside the definition cards, between content sections */}
-          <AdUnit slot="9112255298" />
+          <div className="min-h-[90px]">
+            <AdUnit slot="9112255298" />
+          </div>
 
           {/* ── ETYMOLOGY ───────────────────────────────────────────── */}
           {word.origin && (
