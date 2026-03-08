@@ -23,6 +23,9 @@ export async function POST(req: NextRequest) {
     const tags = Array.isArray(body.tags)
       ? (body.tags as unknown[]).filter((t): t is string => typeof t === 'string' && t.trim().length > 0).map((t) => t.trim().toLowerCase())
       : []
+    const relatedWords = Array.isArray(body.relatedWords)
+      ? (body.relatedWords as unknown[]).filter((s): s is string => typeof s === 'string' && s.trim().length > 0).map((s) => s.trim())
+      : []
 
     // ── Validate ──────────────────────────────────────────────
     if (!word) {
@@ -57,6 +60,7 @@ export async function POST(req: NextRequest) {
       viewCount: 0,
       isFeatured: false,
       tags,
+      relatedWords,
       submittedBy,
     })
 
