@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Inbox, Menu, X } from 'lucide-react'
+import { LayoutDashboard, Inbox, Menu, X, Flag } from 'lucide-react'
 import { SignOutButton } from '@/components/admin/SignOutButton'
 
 // Nav links are defined here (client side) so icon components never cross
@@ -11,16 +11,18 @@ import { SignOutButton } from '@/components/admin/SignOutButton'
 const NAV_LINKS = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, badgeKey: null },
   { href: '/admin/submissions', label: 'Submissions', icon: Inbox, badgeKey: 'pendingCount' as const },
+  { href: '/admin/flags', label: 'Flags', icon: Flag, badgeKey: 'flagsCount' as const },
 ]
 
 interface AdminShellProps {
   children: React.ReactNode
   pendingCount: number
+  flagsCount: number
   email: string
 }
 
-export function AdminShell({ children, pendingCount, email }: AdminShellProps) {
-  const badges: Record<string, number> = { pendingCount }
+export function AdminShell({ children, pendingCount, flagsCount, email }: AdminShellProps) {
+  const badges: Record<string, number> = { pendingCount, flagsCount }
   const pathname = usePathname()
   const [drawerOpen, setDrawerOpen] = useState(false)
 
@@ -124,14 +126,14 @@ export function AdminShell({ children, pendingCount, email }: AdminShellProps) {
           SHENG<span className="text-[#c8f135]">.</span>
         </Link>
 
-        {/* Pending badge shortcut */}
-        {pendingCount > 0 ? (
+        {/* Badge shortcut — show highest count */}
+        {pendingCount > 0 || flagsCount > 0 ? (
           <Link
-            href="/admin/submissions"
+            href={flagsCount >= pendingCount ? '/admin/flags' : '/admin/submissions'}
             className="flex items-center gap-1.5 text-[10px] font-bold bg-[#c8f135] text-black rounded-full px-2 py-1 leading-none"
           >
-            <Inbox className="w-3 h-3" />
-            {pendingCount}
+            {flagsCount >= pendingCount ? <Flag className="w-3 h-3" /> : <Inbox className="w-3 h-3" />}
+            {Math.max(pendingCount, flagsCount)}
           </Link>
         ) : (
           <div className="w-8" aria-hidden />

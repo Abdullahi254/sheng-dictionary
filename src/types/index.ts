@@ -70,6 +70,24 @@ export interface IWordOfTheWeek {
   weekStart: string      // YYYY-MM-DD — the Monday of that week
 }
 
+// ─── Flag ─────────────────────────────────────────────────────────────────────
+
+export type FlagReason = 'not_sheng' | 'mistranslation' | 'offensive' | 'outdated' | 'other'
+export type FlagStatus = 'pending' | 'resolved' | 'dismissed'
+
+export interface IFlag {
+  _id: string
+  wordId: string
+  wordSlug: string
+  wordName: string
+  reason: FlagReason
+  suggestion: string
+  reportedBy: string
+  status: FlagStatus
+  createdAt: Date
+  updatedAt: Date
+}
+
 // ─── API response envelope ────────────────────────────────────────────────────
 
 export type ApiSuccess<T> = { success: true; data: T }

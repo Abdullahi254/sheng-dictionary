@@ -128,22 +128,23 @@ Admins review from here and either approve (moves to words) or reject.
 ---
 
 ## Features to Build (in this exact order)
-1. MongoDB connection setup + all Mongoose models
-2. TypeScript types
-3. Homepage with search, word of the day card, recent words grid
-4. Individual word page `/word/[slug]` with full SEO + structured data
-5. Browse/listing page `/browse` with pagination and filters
-6. Admin authentication with NextAuth
-7. Admin dashboard — overview stats
-8. Admin submissions review (approve / reject)
-9. Admin word manager (add / edit / delete words)
-10. Public word submission form (lands in submissions, not live)
-11. Email subscription form + confirmation
-12. Word of the week cron job (Vercel Cron)
+1. MongoDB connection setup + all Mongoose models ✅ DONE
+2. TypeScript types ✅ DONE
+3. Homepage with search, word of the day card, recent words grid ✅ DONE
+4. Individual word page `/word/[slug]` with full SEO + structured data ✅ DONE
+5. Browse/listing page `/browse` with pagination and filters ✅ DONE
+6. Admin authentication with NextAuth ✅ DONE
+7. Admin dashboard — overview stats ✅ DONE
+8. Admin submissions review (approve / reject / edit before approving) ✅ DONE
+9. Admin word manager (add / edit / delete words) — pending
+10. Public word submission form (lands in submissions, not live) ✅ DONE
+11. Email subscription form + confirmation ✅ DONE
+12. Word of the week cron job (Vercel Cron) ✅ DONE
 13. Share Word as Image Feature
 14. Auto-generated sitemap.xml
 15. Google AdSense integration
 16. Search with MongoDB Atlas Search or simple regex for MVP
+17. Flag Word feature ✅ DONE — see "Flag Word Flow" section below
 
 ---
 
@@ -319,3 +320,93 @@ CRON_SECRET=                    # Random string to protect cron endpoints
 - Show loading spinner on button during generation
 - Never use an external image generation service — canvas only, runs entirely client-side
 - Export `generateWordImage(word: WordType): Promise<Blob>` from `src/lib/generateWordImage.ts`
+
+---
+
+## Admin Submission Editor
+
+Admins can edit any submission field before approving. The inline editor lives inside `SubmissionActions` and expands on "Edit" button click. Editable fields: word, part of speech, meaning, example, etymology/origin, tags, related words, region.
+
+- **PATCH `/api/admin/submissions/[id]`** — updates any combination of fields; if `word` is updated the `slug` is regenerated via `slugify`
+- After saving, calls `router.refresh()` to sync the server-rendered card
+- Approve/Reject buttons are disabled while the editor is open
+
+---
+
+## Public Submission Form — Etymology Field
+
+The public submit form at `/submit` includes an optional **Etymology** field (`body.etymology`) that maps to the `origin` field on the Submission/Word model.
+
+---
+
+## Responsive Admin Layout
+
+The admin layout uses `AdminShell` (`src/components/admin/AdminShell.tsx`) — a client component that handles both desktop and mobile:
+
+- **Desktop (`lg+`):** fixed left sidebar (`w-56`) with logo, nav links + badges, user email, sign-out
+- **Mobile (`< lg`):** sticky top bar with hamburger + logo + badge shortcut; hamburger opens a slide-in drawer overlay
+- Nav links (with icons) are defined inside `AdminShell` so React components never cross the server→client boundary — the layout only passes serializable `pendingCount`, `flagsCount`, `email` props
+- Active link is highlighted with `bg-white/8`
+- Body scroll is locked while the drawer is open
+
+---
+
+## Flag Word Feature
+
+Users can flag a word as incorrect from any word page. Admins review flags, optionally edit the word, then resolve or dismiss.
+
+### flags collection schema
+```typescript
+{
+  wordId: ObjectId        // ref to words collection
+  wordSlug: string        // for display without populate
+  wordName: string        // for display without populate
+  reason: 'not_sheng' | 'mistranslation' | 'offensive' | 'outdated' | 'other'
+  suggestion: string      // optional user suggestion, default ''
+  reportedBy: string      // default 'anonymous'
+  status: 'pending' | 'resolved' | 'dismissed'
+  createdAt: Date
+  updatedAt: Date
+}
+```
+
+### Flag Reasons (user-facing labels)
+- `not_sheng` → "Not actually Sheng"
+- `mistranslation` → "Wrong or misleading translation"
+- `offensive` → "Offensive or inappropriate"
+- `outdated` → "Outdated / no longer used"
+- `other` → "Other"
+
+### Public Flag Flow
+1. User clicks **Flag this word** on any word page (`/word/[slug]`)
+2. Inline form expands — user picks a reason, optionally adds a suggestion and their name
+3. POST `/api/words/[slug]/flag` — validates reason, looks up word, saves Flag with status `pending`
+4. Success message shown, form auto-collapses after 3 s
+
+### Admin Flag Review Flow
+1. Admin sees pending flags at `/admin/flags` with count badge in sidebar
+2. Each card shows: word name, reason pill, suggestion, reporter, date, and the word's current data
+3. Admin can click **Edit** to open the inline word editor (same as submission editor)
+4. **Save changes** → PATCH `/api/admin/words/[wordId]` — updates the live Word document
+5. **Resolve** → POST `/api/admin/flags/[id]/resolve` — marks flag resolved, refreshes page
+6. **Dismiss** → POST `/api/admin/flags/[id]/dismiss` — marks flag dismissed (word was fine)
+
+### Key files
+- `src/models/Flag.ts` — Flag Mongoose model
+- `src/app/api/words/[slug]/flag/route.ts` — public POST endpoint
+- `src/app/api/admin/flags/route.ts` — GET pending flags with word data
+- `src/app/api/admin/flags/[id]/resolve/route.ts` — POST resolve
+- `src/app/api/admin/flags/[id]/dismiss/route.ts` — POST dismiss
+- `src/app/api/admin/words/[id]/route.ts` — PATCH update live word
+- `src/components/words/FlagButton.tsx` — client inline flag form on word pages
+- `src/components/admin/FlagActions.tsx` — inline word editor + resolve/dismiss actions
+- `src/app/admin/(dashboard)/flags/page.tsx` — admin flags review page
+
+### Hydration rule
+Never use multi-line template literal classNames in client components — the server serializes newlines/indentation that the browser collapses before React hydrates, causing a mismatch. Keep all `className` strings on a single line or use `cn()`.
+
+---
+
+## Admin Dashboard — Badge Counts
+
+The `AdminShell` receives `pendingCount` (submissions) and `flagsCount` (flags) as number props from the server layout. Both are shown as badges on their respective sidebar nav links. The mobile top bar shows a single badge pointing to whichever section has the higher count.

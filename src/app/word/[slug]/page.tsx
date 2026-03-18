@@ -7,6 +7,7 @@ import { ChevronRight, MapPin, Eye, Calendar, ArrowRight } from 'lucide-react'
 import { Navbar } from '@/components/shared/Navbar'
 import { ViewCountTracker } from '@/components/words/ViewCountTracker'
 import { ShareWordButton } from '@/components/words/ShareWordButton'
+import { FlagButton } from '@/components/words/FlagButton'
 import AdUnit from '@/components/shared/AdUnit'
 import connectToDatabase from '@/lib/mongodb'
 import Word from '@/models/Word'
@@ -341,12 +342,15 @@ export default async function WordPage({ params }: Props) {
                 ? `Submitted by ${word.submittedBy}`
                 : 'Community submission'}
             </p>
-            <Link
-              href="/browse"
-              className="text-[10px] font-mono tracking-[0.25em] uppercase text-muted-foreground/40 hover:text-[#c8f135] transition-colors"
-            >
-              ← Back to Browse
-            </Link>
+            <div className="flex items-center gap-4">
+              <FlagButton slug={word.slug} wordName={word.word} />
+              <Link
+                href="/browse"
+                className="text-[10px] font-mono tracking-[0.25em] uppercase text-muted-foreground/40 hover:text-[#c8f135] transition-colors"
+              >
+                ← Back to Browse
+              </Link>
+            </div>
           </div>
         </main>
 
