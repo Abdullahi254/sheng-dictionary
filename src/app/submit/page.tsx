@@ -40,6 +40,7 @@ interface FormState {
   partOfSpeech: PartOfSpeech | ''
   definition: string
   example: string
+  etymology: string
   region: string
   submittedBy: string
 }
@@ -51,6 +52,7 @@ const EMPTY_FORM: FormState = {
   partOfSpeech: '',
   definition: '',
   example: '',
+  etymology: '',
   region: 'Nationwide',
   submittedBy: '',
 }
@@ -92,6 +94,7 @@ export default function SubmitPage() {
           word: form.word,
           definition: form.definition,
           example: form.example,
+          etymology: form.etymology,
           partOfSpeech: form.partOfSpeech,
           region: form.region,
           submittedBy: form.submittedBy,
@@ -265,6 +268,24 @@ export default function SubmitPage() {
                   placeholder="Show how the word is used in a sentence."
                   rows={2}
                   className={`${inputClass} py-3 resize-none leading-relaxed`}
+                />
+              </div>
+
+              {/* ── Etymology ── */}
+              <div className="space-y-1.5">
+                <label className="block font-mono text-[11px] tracking-[0.3em] uppercase text-muted-foreground/80">
+                  Etymology
+                  <span className="ml-2 text-muted-foreground/80 normal-case tracking-normal font-body text-xs">
+                    (optional)
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  value={form.etymology}
+                  onChange={set('etymology')}
+                  placeholder="e.g. Derived from Kiswahili 'msee' meaning elder…"
+                  autoComplete="off"
+                  className={`${inputClass} h-12`}
                 />
               </div>
 

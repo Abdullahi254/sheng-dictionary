@@ -27,7 +27,7 @@ export default async function SubmissionsPage() {
   const submissions = await getPendingSubmissions()
 
   return (
-    <div className="max-w-4xl space-y-8">
+    <div className="max-w-4xl space-y-6 sm:space-y-8">
 
       {/* Page header */}
       <div className="flex items-end justify-between gap-4">
@@ -35,7 +35,7 @@ export default async function SubmissionsPage() {
           <p className="font-mono text-[10px] tracking-[0.4em] uppercase text-muted-foreground/80 mb-2">
             Admin
           </p>
-          <h1 className="font-display font-black text-4xl uppercase tracking-tight">
+          <h1 className="font-display font-black text-3xl sm:text-4xl uppercase tracking-tight">
             Submissions
           </h1>
         </div>
@@ -73,11 +73,11 @@ export default async function SubmissionsPage() {
                 key={sub._id}
                 className="bg-[#111111] border border-white/6 rounded-xl overflow-hidden"
               >
-                <div className="p-6 space-y-4">
+                <div className="p-4 sm:p-6 space-y-4">
 
                   {/* Word + PoS */}
-                  <div className="flex flex-wrap items-center gap-3">
-                    <h2 className="font-display font-black text-3xl uppercase tracking-tight leading-none">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <h2 className="font-display font-black text-2xl sm:text-3xl uppercase tracking-tight leading-none">
                       {sub.word}
                     </h2>
                     <span
@@ -125,8 +125,8 @@ export default async function SubmissionsPage() {
                   )}
 
                   {/* Meta row + actions */}
-                  <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-white/6">
-                    <div className="flex items-center gap-4 text-[11px] font-mono text-muted-foreground/80">
+                  <div className="flex flex-col gap-4 pt-2 border-t border-white/6">
+                    <div className="flex flex-wrap items-center gap-3 text-[11px] font-mono text-muted-foreground/80">
                       <span className="flex items-center gap-1.5">
                         <User className="w-3 h-3" />
                         {sub.submittedBy}
@@ -140,7 +140,20 @@ export default async function SubmissionsPage() {
                       )}
                     </div>
 
-                    <SubmissionActions id={sub._id} />
+                    <SubmissionActions
+                      id={sub._id}
+                      initialData={{
+                        word: sub.word,
+                        slug: sub.slug,
+                        partOfSpeech: sub.partOfSpeech,
+                        meaning: sub.definitions[0]?.meaning ?? '',
+                        example: sub.definitions[0]?.example ?? '',
+                        origin: sub.origin ?? '',
+                        tags: sub.tags,
+                        relatedWords: sub.relatedWords,
+                        region: sub.region,
+                      }}
+                    />
                   </div>
                 </div>
               </li>

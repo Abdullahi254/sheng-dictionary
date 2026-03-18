@@ -53,7 +53,7 @@ export default async function AdminPage() {
         <p className="font-mono text-[10px] tracking-[0.4em] uppercase text-muted-foreground/80 mb-2">
           Admin
         </p>
-        <h1 className="font-display font-black text-4xl uppercase tracking-tight">
+        <h1 className="font-display font-black text-3xl sm:text-4xl uppercase tracking-tight">
           Overview
         </h1>
       </div>

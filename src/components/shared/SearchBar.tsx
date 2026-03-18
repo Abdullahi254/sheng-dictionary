@@ -27,27 +27,11 @@ export function SearchBar() {
           placeholder="e.g. panda, msee, sawa..."
           autoComplete="off"
           spellCheck={false}
-          className="
-            w-full h-16 pl-14 pr-36
-            bg-white/5 border border-white/10
-            rounded-xl text-base text-foreground
-            placeholder:text-muted-foreground/60
-            outline-none font-body
-            transition-all duration-300
-            focus:border-[#c8f135]/40 focus:bg-white/[0.07] focus:ring-2 focus:ring-[#c8f135]/10
-          "
+          className="w-full h-16 pl-14 pr-36 bg-white/5 border border-white/10 rounded-xl text-base text-foreground placeholder:text-muted-foreground/60 outline-none font-body transition-all duration-300 focus:border-[#c8f135]/40 focus:bg-white/[0.07] focus:ring-2 focus:ring-[#c8f135]/10"
         />
         <button
           type="submit"
-          className="
-            absolute right-2 h-12 px-5
-            bg-[#c8f135] text-black
-            font-display font-bold text-sm uppercase tracking-wider
-            rounded-lg
-            hover:bg-[#d4f545] active:scale-95
-            transition-all duration-150
-            disabled:opacity-50
-          "
+          className="absolute right-2 h-12 px-5 bg-[#c8f135] text-black font-display font-bold text-sm uppercase tracking-wider rounded-lg hover:bg-[#d4f545] active:scale-95 transition-all duration-150 disabled:opacity-50"
           disabled={!query.trim()}
         >
           Search

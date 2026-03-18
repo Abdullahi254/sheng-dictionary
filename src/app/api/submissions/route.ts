@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
     const definition = typeof body.definition === 'string' ? body.definition.trim() : ''
     const example = typeof body.example === 'string' ? body.example.trim() : ''
     const partOfSpeech = typeof body.partOfSpeech === 'string' ? body.partOfSpeech : ''
+    const etymology = typeof body.etymology === 'string' && body.etymology.trim() ? body.etymology.trim() : undefined
     const region = typeof body.region === 'string' && body.region.trim() ? body.region.trim() : 'Nationwide'
     const submittedBy = typeof body.submittedBy === 'string' && body.submittedBy.trim()
       ? body.submittedBy.trim()
@@ -55,6 +56,7 @@ export async function POST(req: NextRequest) {
         },
       ],
       partOfSpeech: partOfSpeech as PartOfSpeech,
+      origin: etymology,
       region,
       status: 'pending',
       viewCount: 0,
