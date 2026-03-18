@@ -200,7 +200,7 @@ export default async function WordPage({ params }: Props) {
               </div>
             )}
 
-            {/* Meta row + share — pinned to bottom of header */}
+            {/* Meta row + actions — pinned to bottom of header */}
             <div className="flex flex-wrap items-center justify-between gap-4 pb-8 border-b border-white/[0.06]">
               <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 font-mono text-[10px] tracking-[0.25em] uppercase text-muted-foreground/40">
                 {word.region && (
@@ -218,7 +218,10 @@ export default async function WordPage({ params }: Props) {
                   {createdAt}
                 </span>
               </div>
-              <ShareWordButton word={word} />
+              <div className="flex items-center gap-2">
+                <FlagButton slug={word.slug} wordName={word.word} />
+                <ShareWordButton word={word} />
+              </div>
             </div>
           </div>
         </header>
@@ -342,15 +345,12 @@ export default async function WordPage({ params }: Props) {
                 ? `Submitted by ${word.submittedBy}`
                 : 'Community submission'}
             </p>
-            <div className="flex items-center gap-4">
-              <FlagButton slug={word.slug} wordName={word.word} />
-              <Link
-                href="/browse"
-                className="text-[10px] font-mono tracking-[0.25em] uppercase text-muted-foreground/40 hover:text-[#c8f135] transition-colors"
-              >
-                ← Back to Browse
-              </Link>
-            </div>
+            <Link
+              href="/browse"
+              className="text-[10px] font-mono tracking-[0.25em] uppercase text-muted-foreground/40 hover:text-[#c8f135] transition-colors"
+            >
+              ← Back to Browse
+            </Link>
           </div>
         </main>
 
